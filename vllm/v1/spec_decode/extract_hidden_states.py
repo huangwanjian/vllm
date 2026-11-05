@@ -177,7 +177,8 @@ class ExtractHiddenStatesProposer:
         # On decode steps with spec tokens, sampled_token_ids may have
         # shape [batch_size, 2] (target + spec verification); slice to
         # return only the target-sampled column.
-        return sampled_token_ids[:, :1]
+        #return sampled_token_ids[:, :1]
+        return torch.full_like(sampled_token_ids[:, :1], -1)
 
     def _get_slot_mapping(
         self,

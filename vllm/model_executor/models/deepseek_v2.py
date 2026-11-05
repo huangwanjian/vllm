@@ -23,7 +23,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Inference-only DeepseekV2/DeepseekV3 model."""
-
+import re
 import typing
 from collections.abc import Callable, Iterable
 from itertools import islice
@@ -1560,6 +1560,12 @@ class DeepseekV2Model(nn.Module):
         }
         for name, loaded_weight in weights:
             if "rotary_emb.inv_freq" in name:
+                continue
+
+            # Skip layers beyond num_hidden_layers (layer reduction via config)
+            layer_match = re.search(r'(?:^|\.)layers\.(\d+)\.', name)
+            if layer_match and int(layer_match.group(1)) >= \
+                    self.config.num_hidden_layers:
                 continue
 
             spec_layer = get_spec_layer_idx_from_weight_name(self.config, name)
